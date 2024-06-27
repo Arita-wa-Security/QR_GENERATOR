@@ -3,27 +3,37 @@ const form = document.querySelector("#form")
 const qr_code = document.querySelector("#qr-code")
 
 
-const generateSubmit = () => {
-    // e.preventDefault()
+const generateSubmit = (e) => {
+    e.preventDefault()
     clearQR
     const url = document.getElementById("exampleInputEmail1").value
     console.log(url)
     if (url===""){
         alert("Please enter valid url")
     }else {
-       return generateQR(url)
+       return generateQR(url, function(qrCodeDataURL) {
+        embedQRCodeInPDF(qrCodeDataURL);
+      })
     }
 }
 
 
-const generateQR = (url) => {
+const generateQR = (url, callback) => {
 
     const qr = new QRCode(qr_code,{
         text:url,
-        height:85,
-        width:85
+        height:305,
+        width:305
     })
-    return qr
+    // return qr
+    setTimeout(function() {
+      const img = qr_code.querySelector('img');
+      if (img) {
+        callback(img.src);
+      } else {
+        alert('QR Code generation failed');
+      }
+    }, 500);
 }
 
 
@@ -37,14 +47,13 @@ const clearQR = () => {
 
 // document.getElementById("exampleInputEmail1").style.backgroundColor = "yellow";
 
-function addQRCodeToPDF(event) {
-    event.preventDefault()
+function embedQRCodeInPDF(qrCodeDataURL) {
     const fileInput = document.getElementById('exampleInputPassword1');
     if (fileInput.files.length === 0) {
       alert('Please select a PDF file first.');
       return;
     }
-    generateSubmit()
+    // generateSubmit()
     const file = fileInput.files[0];
     console.log(file)
     const reader = new FileReader();
@@ -54,16 +63,22 @@ function addQRCodeToPDF(event) {
       const arrayBuffer = event.target.result;
       PDFLib.PDFDocument.load(arrayBuffer).then(function(pdfDoc) {
         // generateQRCode("www.google.com",
-            (qrCodeDataURL) => {
+            // const embedQRCodeInPDF= (qrCodeDataURL) => {
               
               
-              pdfDoc.getPage(0).then(function (firstPage) {
+              const firstPage = pdfDoc.getPage(0)
+              // .then(function (firstPage) {
                 pdfDoc.embedPng(qrCodeDataURL).then(function (pngImage) {
                   const { width, height } = pngImage.scale(0.25); // Adjust the scale as needed
+                   
+                    const pageWidth = firstPage.getWidth() 
+                    const pageHeight = firstPage.getHeight() 
+                    const x = (pageWidth - width) / 2;
+                    const y = (pageHeight - height) / 2 - height;
 
                   firstPage.drawImage(pngImage, {
-                    x: firstPage.getWidth() - width - 10,
-                    y: firstPage.getHeight() - height - 10,
+                    x,
+                    y,
                     width,
                     height,
                   });
@@ -73,14 +88,16 @@ function addQRCodeToPDF(event) {
                     console.log("QR code added to PDF successfully and the PDF has been downloaded.");
                   });
                 });
-              });
-            }
-        // );
+              // }
       });
+            // }
+        // );
+      };
+      reader.readAsArrayBuffer(file);
     };
    
-    reader.readAsArrayBuffer(file);
-  }   
+    
+    
 
   function download(data, filename, type) {
     const blob = new Blob([data], { type });
@@ -96,4 +113,4 @@ function addQRCodeToPDF(event) {
     }, 0);
   }
 
-  form.addEventListener('submit', addQRCodeToPDF)
+  form.addEventListener('submit', generateSubmit)
