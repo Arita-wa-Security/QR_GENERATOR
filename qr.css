@@ -31,11 +31,12 @@ h1{
 
 #qr-code{
     border: 5px solid;
-    width: 10%;
-    height: 100px;
-    margin-top: 45%;
+    width: 27%;
+    height: 330px;
+    margin-top: 25%;
+    top: 45%;
     left: 39%;
-    transform: translate(0, -50%);
+    transform: translate(-35%, -50%);
     position: absolute;
     padding: 5px;
 }
