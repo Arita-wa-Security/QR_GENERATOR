@@ -70,11 +70,16 @@ function embedQRCodeInPDF(qrCodeDataURL) {
               // .then(function (firstPage) {
                 pdfDoc.embedPng(qrCodeDataURL).then(function (pngImage) {
                   const { width, height } = pngImage.scale(0.25); // Adjust the scale as needed
-                   
-                    const pageWidth = firstPage.getWidth() 
-                    const pageHeight = firstPage.getHeight() 
-                    const x = (pageWidth - width) / 2;
-                    const y = (pageHeight - height) / 2 - height;
+
+                  const pageWidth = firstPage.getWidth();
+                  const pageHeight = firstPage.getHeight();
+                  const x = (pageWidth - width) / 2;
+                  // Estimate content ends about 100 pts from bottom (change if needed)
+                  const estimatedContentBottom = 330;
+
+                  // Position QR code 1cm (28.35 pts) below content
+                  const y = estimatedContentBottom - height - 28.35;
+                  // const y = (pageHeight - height) / 2 - height;
 
                   firstPage.drawImage(pngImage, {
                     x,
@@ -85,7 +90,9 @@ function embedQRCodeInPDF(qrCodeDataURL) {
 
                   pdfDoc.save().then(function (pdfBytes) {
                     download(pdfBytes, "modified.pdf", "application/pdf");
-                    console.log("QR code added to PDF successfully and the PDF has been downloaded.");
+                    console.log(
+                      "QR code added to PDF successfully and the PDF has been downloaded."
+                    );
                   });
                 });
               // }
