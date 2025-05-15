@@ -75,7 +75,7 @@ function embedQRCodeInPDF(qrCodeDataURL) {
                   const pageHeight = firstPage.getHeight();
                   const x = (pageWidth - width) / 2;
                   // Estimate content ends about 100 pts from bottom (change if needed)
-                  const estimatedContentBottom = 330;
+                  const estimatedContentBottom = 290;
 
                   // Position QR code 1cm (28.35 pts) below content
                   const y = estimatedContentBottom - height - 28.35;
